@@ -15,15 +15,22 @@ def calculate_drag_force(velocity):
     F_drag = (1/2)(tafrc_air_density)(velocity**2)(drag_coeff)((ball_radius**2) * math.pi)
     return F_drag
 
-def calculate_magnus(velocity):
+def calculate_magnus_force(velocity):
     lift_coeff = 0.2
     ball_radius = 0.0889
     F_magnus = (1/2)(tafrc_air_density)(velocity**2)(lift_coeff)((ball_radius**2) * math.pi)
     return F_magnus
 
-def force_on_trajectory(force, theta_horizontal, theta_vertical):
-    acceleration_vector = force/tafrc_ball_mass
-    return split_vector(acceleration_vector, theta_vertical, theta_horizontal)
+def total_accel_by_force(F_drag, F_magnus):
+    A_drag = F_drag/tafrc_ball_mass
+    A_magnus = F_magnus/tafrc_ball_mass
+
+    split_drag = split_vector(A_drag)
+    split_magnus = split_vector(A_magnus)
+
+    total_accel = [split_drag[0] + split_magnus[0], split_drag[1] + split_magnus[1], split_drag[1] + split_magnus[1]]
+
+    return total_accel
 
 def split_vector(vector, theta_vertical, theta_horizontal):
      # split 3d vector into plane and vector
@@ -45,35 +52,35 @@ def calculate_position(height, distance, theta_horizontal):
     position = [xPos, zPos, yPos]
     return position
 
-def calculate_airtime(xVel, zVel, yVel, height, distance, theta_vertical, theta_horizontal):
+def calculate_airtime(iVel, xVel, zVel, yVel, height, distance, theta_vertical, theta_horizontal):
     # init position
     position = calculate_position(height, distance, theta_horizontal)
+    total_accel = total_accel_by_force(calculate_drag_force(iVel), calculate_magnus_force(iVel))
 
     # calculate possible air times
-    quadsolve_discriminant = math.sqrt(yVel**2 - 4 * (tafrc_gravity/2) * height)
-    max_time = (-yVel + quadsolve_discriminant)/tafrc_gravity if (-yVel + quadsolve_discriminant)/tafrc_gravity > 0 else (-yVel - quadsolve_discriminant)/tafrc_gravity
+    quadsolve_discriminant = math.sqrt(yVel**2 - 4 * ((tafrc_gravity + total_accel[2])/2) * height)
+    max_time = (-yVel + quadsolve_discriminant)/((tafrc_gravity + total_accel[2])/2) if (-yVel + quadsolve_discriminant)/((tafrc_gravity + total_accel[2])/2) > 0 else (-yVel - quadsolve_discriminant)/((tafrc_gravity + total_accel[2])/2)
     x_time = position[0]/xVel
 
     # find correct air time
     airtime = x_time if x_time >= max_time else max_time
 
-
-
     return airtime
 
-def position_at_time(xVel, zVel, yVel, height, distance, time):
-    position = [xVel * (time), zVel * (time), yVel * (time) + height + (tafrc_gravity/2) * ((time)**2), time]
+def position_at_time(iVel, xVel, zVel, yVel, height, distance, time):
+    total_accel = total_accel_by_force(calculate_drag_force(iVel), calculate_magnus_force(iVel))
+    position = [xVel * (time) + total_accel[0]/2 * time**2, zVel * (time) + total_accel[1]/2 * time**2, yVel * (time) + height + (tafrc_gravity/2 + total_accel[2]/2) * ((time)**2), time]
     return position
 
 def trajectory_calculator(iVel, theta_vertical, theta_horizontal, height, distance):
     # find vector components
     vel_components = split_vector(iVel, theta_vertical, theta_horizontal)
     # find how much time to map trajectory
-    airtime = calculate_airtime(vel_components[0], vel_components[1], vel_components[2], height, distance, theta_vertical, theta_horizontal)
+    airtime = calculate_airtime(iVel, vel_components[0], vel_components[1], vel_components[2], height, distance, theta_vertical, theta_horizontal)
     #print position at time x
     print(airtime)
     for i in range (int(airtime * 100) + 1):
-        temp = position_at_time(vel_components[0], vel_components[1], vel_components[2], height, distance, time=i/100)
+        temp = position_at_time(iVel, vel_components[0], vel_components[1], vel_components[2], height, distance, time=i/100)
         print("x: " + str(temp[0]) + " z: " + str(temp[1]) + " y: " + str(temp[2]) + " t: " + str(temp[3]))
 
 
