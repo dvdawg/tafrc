@@ -41,8 +41,8 @@ class shooterGUI():
         self.fig = Figure(figsize = (5,5), dpi = 100)
 
         #label and values for variables
-        self.label  = []*self.numparam 
-        self.e1     = []*self.numparam 
+        self.label  = [] * self.numparam 
+        self.e1     = [] * self.numparam 
 
         # init frames and plot
         self._init_left_frame() 
@@ -91,10 +91,10 @@ class shooterGUI():
             self.main_tech.setparameters(i,self.e1[i].get())
 
         # do calculation with the parameters 
-        traj_x, traj_y = self.main_tech.calculateTrajct()
+        height, distance, theta_vertical, theta_horizontal, iVel = self.main_tech.calculateTrajct()
 
         # after calculation, it is ready to plot
-        self.updateplot(traj_x, traj_y)
+        self.updateplot(height, distance, theta_vertical, theta_horizontal, iVel)
     
     def updateplot(self, x, y):
         subplot = self.subplot
@@ -114,94 +114,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-# # ----== init window ==-------------------------------
-
-# # the main window object
-# main_wnd = tk.Tk()
-# main_wnd.title('Your title')
-
-# #bottom frame for text and misc, not necessarily required...
-# bottomframe = tk.Frame(main_wnd)
-# bottomframe.pack( side = tk.BOTTOM )
-
-# #frame for control parameters
-# control_frame = tk.Frame(main_wnd)
-# control_frame.pack(side = tk.LEFT, padx = "10")
-
-# #frame for plotting
-# plot_frame = tk.Frame(main_wnd)
-# plot_frame.pack( side = tk.RIGHT )
-
-# # ----== init figure for plotting ==-------------------------------
-
-# # Creating Figure.
-# fig = Figure(figsize = (5,5), dpi = 100)
-
-
-# # ----== init constant and GUI variables ==-------------------------------
-# #init constant
-# NUMPARAM = 10
-# label = []*NUMPARAM
-# e1= []*NUMPARAM
-
-# #TODO: make a class containing canv, subplot, x, y
-
-# # ----== functions for GUI ==-------------------------------
-# def calculate(paramlist, canv, subplot):
-#     # do calculation here
-#     x=[ 1, 2, 3 ,4 ,5 ,6 ,7]
-#     y=[ 1, 2, 3, 4, 5, 6, 7]
-#     # call update plot 
-#     updateplot(canv, subplot, x, y)
-
-# def updateplot(canv, subplot, x, y):
-    
-#     subplot.plot(x,y, marker = "o", label = "Trajectory")
-#     subplot.set_xlabel("height (m)")
-#     subplot.set_ylabel("x (m)")
-#     subplot.set_title("Graph_Tk")
-#     subplot.legend()
-#     subplot.grid()
-#     canv.draw()
-
-# # ----== build GUI ==-------------------------------
-
-# # *** parameter (left) window
-
-# for i in range(NUMPARAM):
-#     label.append(tk.Label(control_frame, text='Param'+str(i)).grid(row=i,ipadx ="10",ipady ="10"))
-#     e1.append(tk.Entry(control_frame))
-#     e1[i].grid(row=i, column=1)
-
-# # Create a RESULT Button & attached to calculation function
-# button_result = tk.Button(control_frame, text = "RESULT", bg = "red", fg = "black", width=15, command = calculate)    
-# button_result.grid(row = NUMPARAM+2, column = 1)
-
-
-
-# ##### plotting
-
-# x = []
-# y = []
-
-# # Plotting the graph inside the Figure
-# subplot = fig.add_subplot(111)
-
-
-# # Creating Canvas
-# canv = FigureCanvasTkAgg(fig, master = plot_frame)
-
-# updateplot(canv, subplot, x, y)
-
-# get_widz = canv.get_tk_widget()
-# get_widz.pack()
-
-# #add widgets
-# button1 = tk.Button(bottomframe, text='Close', width=25, command=main_wnd.destroy)
-# button1.pack()
-
-# main_wnd.mainloop()
-
