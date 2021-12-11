@@ -1,4 +1,4 @@
-# TAFRC
+# TAFRC v1.0
 
 TAFRC is a physics library intended for use in the FIRST Robotics Competition (hence the name tool-assisted FRC).
 
