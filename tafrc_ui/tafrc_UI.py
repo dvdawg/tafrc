@@ -1,17 +1,17 @@
 #for GUI
 import tkinter as tk
 #for plotting
-import matplotlib as mpl
+import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import numpy as np
 
 from trajectory import Trajectory
 
-
-# CHANGED: input for graph does not work on old version
-# changed the type of graph on the subplot to create new graph
-
+# plot constant
+xlabel = ["x(m)", "x(m)", "y- height(m)"]
+ylabel = ["y- height(m)", "z(m)", "z(m)"]
+plot_title = ["x-y", "x-z","y-z"]
 
 #UI class for control parameters, calculate button and plot
 class shooterGUI():
@@ -23,6 +23,13 @@ class shooterGUI():
         self.main_wnd = tk.Tk() 
         self.main_wnd.title(self.main_tech.title)
         
+        def exit_function():
+            # Put any cleanup here.  
+            self.main_wnd.quit()
+
+        self.main_wnd.protocol('WM_DELETE_WINDOW', exit_function)
+
+
         # number of variables, list is defined in the main tech (trajectory class)
         self.numparam = len(self.main_tech.paramlist)
 
@@ -43,9 +50,11 @@ class shooterGUI():
         self.plot_frame.pack( side = tk.RIGHT )
 
         # Creating a figure for plotting
-        self.fig = Figure(figsize = (5,5), dpi = 100)
+        self.fig = plt.figure(figsize = (5,6), dpi = 100)
+        self.fig.subplots_adjust(hspace=.5)
 
         #label and values for variables
+        self.label2 = [] * 10 #TODO: macro instead of 10
         self.label  = [] * self.numparam 
         self.e1     = [] * self.numparam 
 
@@ -60,6 +69,7 @@ class shooterGUI():
 
      # *** parameter (left) window
     def _init_left_frame(self):
+        
         for i in range(self.numparam):
             #take pamameter name from the list for display
             self.label.append(tk.Label(self.control_frame, text=self.main_tech.param_str[i]).grid(row=i,ipadx ="10",ipady ="10"))
@@ -68,27 +78,47 @@ class shooterGUI():
             self.e1[i].insert(tk.END, '0')
             self.e1[i].grid(row=i, column=1)
 
+        #   place example values for the variables
+        for i, val in enumerate(self.main_tech.default_val):
+            self.e1[i].insert(tk.END, val)
+
         # Create a RESULT Button & attached to calculation function
         self.button_result = tk.Button(self.control_frame, text = "RESULT", bg = "red", fg = "black", width=15, command = self.calculate)    
         self.button_result.grid(row = self.numparam+2, column = 1)
-    
+        
+        var = tk.StringVar()
+        var.set("========= Usage =========\n\
+                Input the values in the boxes to simulate the \n\
+                path of your field element relative to your target.\n\
+                All units are in SI units - \n\
+                distance and height - meters\n\
+                velocity - meters/second \n\
+                angle - degrees relative to coordinate axes\n\n\
+                1. input shooter height, target height, and target x/z\n\
+                2. input initial velocity and the shooter orientation(angles)\n\
+                3. set time to interval (in seconds)\n\
+                4. press result to view the trajectory with these conditions\n\
+                5. adjust shooter angles to hit the target, repeat until the path of the projectile hits the target.")  
+        self.label2.append(tk.Label( self.control_frame, textvariable=var).grid(row=self.numparam))
+
     def _init_right_frame(self):
         ##### plotting
-
         # Plotting the graph inside the Figure - add subplot
-        self.subplot = self.fig.add_subplot(111)
+        
+        self.subplot = [self.fig.add_subplot(311), self.fig.add_subplot(312),self.fig.add_subplot(313)]
 
         # Creating Canvas that connect tkinter and matplot
         self.canv = FigureCanvasTkAgg(self.fig, master = self.plot_frame)
         get_widz = self.canv.get_tk_widget()
         get_widz.pack()
-        #TODO: add reset button for resetting all the values ?
-    
+        #TODO: add reset button for resetting all the values ?      
+
     #bottom frame for now only has close button. 
     def _init_bottom_frame(self):
         #add widgets
-        self.button1 = tk.Button(self.bottomframe, text='Close', width=25, command=self.main_wnd.destroy)
+        self.button1 = tk.Button(self.bottomframe, text='Close', width=25, command=self.main_wnd.quit)
         self.button1.pack()
+
     
     def calculate(self):
         # get parameter values from GUI
@@ -96,21 +126,61 @@ class shooterGUI():
             self.main_tech.setparameters(i,self.e1[i].get())
 
         # do calculation with the parameters 
-        height, distance, theta_vertical, theta_horizontal, iVel = self.main_tech.calculateTrajct()
-
+        x, y, z = self.main_tech.calculateTrajct()
+  
+        
         # after calculation, it is ready to plot
-        self.updateplot(height, distance, theta_vertical, theta_horizontal, iVel)
+        self.updateplot(x,y,z)
     
-    def updateplot(self, x, y):
-        subplot = self.subplot
-        subplot.plot(x,y, marker = "o", label = "Trajectory")
-        subplot.set_xlabel("height (m)")
-        subplot.set_ylabel("x (m)")
-        subplot.set_title("Graph_Tk")
-        subplot.legend()
-        subplot.grid()
+    def updateplot(self, x, y, z):
+        self.fig.clf()
+        self.subplot = [self.fig.add_subplot(311), self.fig.add_subplot(312),self.fig.add_subplot(313)]
+        for i, subplot in enumerate(self.subplot):
+            
+            if i==0:
+                plot_x = x
+                plot_y = y
+                #plot the target location
+                
+                markerline, stemlines, baseline = subplot.stem(float(self.main_tech.paramlist['target_x(m)']),float(self.main_tech.paramlist['target_y_height']), markerfmt='o',label='target',basefmt="m")       
+                plt.setp(stemlines, 'linewidth', 0)
+            elif i==1:
+                plot_x = x
+                plot_y = z
+                #plot the target location
+                markerline, stemlines, baseline = subplot.stem(float(self.main_tech.paramlist['target_x(m)']),float(self.main_tech.paramlist['target_z']), markerfmt='o',label='target',basefmt="m")       
+                plt.setp(stemlines, 'linewidth', 0)
+            elif i==2:
+                plot_x = y
+                plot_y = z
+                #plot the target location
+                markerline, stemlines, baseline = subplot.stem(float(self.main_tech.paramlist['target_y_height']),float(self.main_tech.paramlist['target_z']), markerfmt='o',label='target',basefmt="m")       
+                plt.setp(stemlines, 'linewidth', 0)
+            
+            #plot trajectory
+            self.setplotvals(subplot,plot_x,plot_y, xlabel[i], ylabel[i], plot_title[i])
+
+            
+        
         self.canv.draw()
 
+
+    def setplotvals(self, subplot,x,y,xlabel, ylabel, title):
+
+        #subplot.stem(self.main_tech.paramlist['target_x(m)'],self.main_tech.paramlist['target_y_height'], markerfmt='o',label='target')
+
+
+        subplot.plot(x,y, marker = "o", label = "Trajectory")
+        
+        subplot.set_xlabel(xlabel,  loc='right')
+        subplot.set_ylabel(ylabel)
+        subplot.set_title(title)
+        subplot.legend()
+        subplot.grid()
+
+        
+
+        
 
 def main():
     sh_gui = shooterGUI()

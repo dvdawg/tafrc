@@ -1,10 +1,16 @@
 import math
 
+# create constants
+tafrc_gravity = -9.8
+tafrc_air_density = 1.225
+tafrc_ball_mass = 0.141748 # in grams
+
 class Trajectory():
     def __init__(self):
-        self.title = 'Trajectory'
+        self.title = 'Trajectory v1.0'
         self.paramlist={} #dictionary
-        self.param_str = ['distance','height','angle_vertical', 'angle_horizontal','iVel', 'time']
+        self.param_str = ['target_x(m)','target_y_height','target_z','shooter_height(m)','angle_vertical', 'angle_horizontal','initial_Velocity', 'time']
+        self.default_val =[10, 5, 10, 1, 40, 20, 18, 5]
 
         for param in self.param_str:
             self.paramlist[param]=0
@@ -39,7 +45,14 @@ class Trajectory():
         # calculate possible air times
         quadsolve_discriminant = math.sqrt(yVel**2 - 4 * (tafrc_gravity/2) * height)
         max_time = (-yVel + quadsolve_discriminant)/tafrc_gravity if (-yVel + quadsolve_discriminant)/tafrc_gravity > 0 else (-yVel - quadsolve_discriminant)/tafrc_gravity
-        x_time = position[0]/xVel
+        
+        # avoid divide by zero
+        if (xVel == 0):
+            #TODO: pass this message to UI so that it can be displaed in the UI
+            print(f"error xVel is zero. cannot get accurate calculation!")
+            x_time = 0
+        else:
+            x_time = position[0]/xVel
 
         # find correct air time
         airtime = x_time if x_time >= max_time else max_time
@@ -47,7 +60,8 @@ class Trajectory():
 
     def position_at_time(self, xVel, zVel, yVel, height, distance, time):
         position = [xVel * (time), zVel * (time), yVel * (time) + height + (tafrc_gravity/2) * ((time)**2), time]
-        return position
+        #return x, y for now. TODO: Later when the x-z, y-z plots are introduced, update the return values.
+        return position[0], position[2], position[1]
 
     def trajectory_calculator(self, iVel, theta_vertical, theta_horizontal, height, distance, time):
         # find vector components
@@ -66,12 +80,21 @@ class Trajectory():
         self.paramlist[self.param_str[index]] = value
 
     def calculateTrajct(self):
-        height = self.paramlist['height']
-        distance = self.paramlist['distance']
-        theta_vertical = self.paramlist['angle_vertical']
-        theta_horizontal = self.paramlist['angle_horizontal']
-        iVel = self.paramlist['iVel']
-        time = self.paramlist['time']
+        height = float(self.paramlist['shooter_height(m)'])
+        #calculate distance
+        distance = math.sqrt(float(self.paramlist['target_x(m)'])**2 + float(self.paramlist['target_y_height'])**2+ float(self.paramlist['target_z'])**2)
+        theta_vertical = float(self.paramlist['angle_vertical'])
+        theta_horizontal = float(self.paramlist['angle_horizontal'])
+        iVel = float(self.paramlist['initial_Velocity'])
+        time = float(self.paramlist['time'])
         
+        x=[]
+        y=[]
+        z=[]
+        for i in range(int(time)):
+            x_val,y_val, z_val = self.trajectory_calculator(iVel, theta_vertical, theta_horizontal, height, distance, i)
+            x.append(x_val)
+            y.append(y_val)
+            z.append(z_val)
         
-        return self.trajectory_calculator(iVel, theta_vertical, theta_horizontal, height, distance, time)
+        return x, y, z
