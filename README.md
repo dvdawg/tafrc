@@ -7,11 +7,11 @@ It consists of a few modules written to simulate the trajectory of field element
 The trajectory simulation is done through the modules that will eventually end up on the software for our robot in the upcoming season.
 
 ## Usage
-Download the folder `tafrc_ui` which contains the the module `trajectory.py` and the GUI `tafrc_UI.py`.
+Download the folder `tafrc_ui` which contains the the module `tafrc_ui/trajectory.py` and the GUI `tafrc_ui/tafrc_UI.py`.
 
 To run the simulation GUI, run
 
-`python3 tafrc_UI.py`
+```python3 tafrc_UI.py```
 ## Calculations
 
 Most of the trajectory calculations comprise of kinematics that are easily computable:
