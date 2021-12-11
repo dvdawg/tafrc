@@ -6,6 +6,8 @@ It consists of a few modules written to simulate the trajectory of field element
 
 The trajectory simulation is done through the modules that will eventually end up on the software for our robot in the upcoming season.
 
+The UI is a simple simulation software for now, but I plan to implement a system to adjust the angles to hit the target. 
+
 ## Usage
 Download the folder `tafrc_ui` which contains the the module `tafrc_ui/trajectory.py` and the GUI `tafrc_ui/tafrc_UI.py`.
 
