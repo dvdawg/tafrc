@@ -29,8 +29,19 @@ With the vector **R** and the height of the shooter given, the calculations spli
 after splitting the initial velocity into component vectors. 
 
 ![image](https://user-images.githubusercontent.com/62197882/145667353-ca23dbb5-0087-4da0-a105-804cd8904ce5.png)
+
 ![image](https://user-images.githubusercontent.com/62197882/145667357-30d90b11-f91c-49b5-b1fd-909a31aa4e7b.png)
+
 ![image](https://user-images.githubusercontent.com/62197882/145667390-bcdd3d9d-292e-45a4-bafe-59f0bbd2fef7.png)
 
 The UI takes these values and displays them accordingly, along with the position of the target to assist with aiming.
 
+## Competition and Previous Experience
+
+This module was made due to my experiences in FRC in the 2019-2020 season. Our robot previously had difficulties taking advantage of our sensors that could detect the reflective tape located on the target goal:
+
+![image](https://user-images.githubusercontent.com/62197882/145667535-ce412c69-6019-4634-b12f-7e3e41c27106.png)
+
+Our sensors were imprecise, and our autonomous phase during the competition was sloppy. However, this year, our team has purchased a new sensor with much stronger and precise measurement capabilities, that send data on the distance of the reflective tape from the sensor, as well as the angle of the target from the sensor.
+
+This library was made to assist our team, as well as any other FRC teams looking to improve the aiming on their robots, which ended up being extremely inaccurate during the competition for most robots. 
