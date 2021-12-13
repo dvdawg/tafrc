@@ -8,14 +8,21 @@ The trajectory simulation is done through the modules that will eventually end u
 
 The UI is a simple simulation software for now, but I plan to implement a system to adjust the angles to hit the target. 
 
+The window is initially created with a few pre-set values, that are reasonable for a shooter.
+
 ![image](https://user-images.githubusercontent.com/62197882/145742919-c8c3cd8d-120f-4a85-9a8e-c685f8a13890.png)
 
+After clicking the result button, the trajectory of the default values looks like this:
+
 ![image](https://user-images.githubusercontent.com/62197882/145740002-ea9e2a2c-3b47-4843-b1a8-6289a6f1399f.png)
+
+Adjusting angles to hit the target:
 
 ![image](https://user-images.githubusercontent.com/62197882/145744920-996ac145-56f8-42de-84e6-d2989d027947.png)
 
 ![image](https://user-images.githubusercontent.com/62197882/145744963-eabdd5c4-8ab6-44f1-b21d-9db0e4560770.png)
 
+Matching the orientation of both angles should create the correct trajectory for your shooter.
 
 ## Usage
 Download the folder `tafrc_ui` which contains the the module `tafrc_ui/trajectory.py` and the GUI `tafrc_ui/tafrc_UI.py`.
