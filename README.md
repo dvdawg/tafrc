@@ -63,3 +63,6 @@ This module was made due to my experiences in FRC in the 2019-2020 season. Our r
 Our sensors were imprecise, and our autonomous phase during the competition was sloppy. However, this year, our team has purchased a new sensor with much stronger and precise measurement capabilities, that send data on the distance of the reflective tape from the sensor, as well as the angle of the target from the sensor.
 
 This library was made to assist our team, as well as any other FRC teams looking to improve the aiming on their robots, which ended up being extremely inaccurate during the competition for most robots. 
+
+![image](https://user-images.githubusercontent.com/62197882/196075809-9b1879db-9b91-4d57-b3a8-0d05440c3549.png)
+
